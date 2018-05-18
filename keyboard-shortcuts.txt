@@ -1,0 +1,17 @@
+<Primary><Alt>c google-chrome
+<Primary><Alt>k slack
+<Alt><Super>Up volume.sh up
+<Alt><Super>Down volume.sh down
+<Alt><Super>Left volume.sh mute
+<Super>Right volume.sh next
+<Super>Left volume.sh previous
+<Primary><Alt>s spotify
+<Primary><Alt>e xfce4-terminal --maximize
+<Super>Up volume.sh playpause
+<Super>q wmctrl -a Terminal
+<Super>s wmctrl -a slack
+<Super>t wmctrl -a telegram
+<Super>w focus_chrome
+<Super>c focus_chrome 2
+<Primary><Alt>l xfce4-keyboard-settings
+<Primary><Alt>w X.sh
