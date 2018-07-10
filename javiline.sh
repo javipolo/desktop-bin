@@ -5,12 +5,13 @@
 
 __javiline() {
     # Colorscheme
-    RESET='\[\033[m\]'
 
-    COLOR_CWD='\[\033[38;5;39m\]'
-    COLOR_GIT='\[\033[38;5;71m\]'
-    COLOR_SUCCESS='\[\033[38;5;121m\]'
-    COLOR_FAILURE='\[\033[38;5;204m\]'
+    COLOR_CWD='\033[38;5;39m'
+    COLOR_GIT='\033[38;5;71m'
+    COLOR_SUCCESS='\033[38;5;121m'
+    COLOR_FAILURE='\033[38;5;204m'
+    COLOR_WARNING='\033[38;5;209m'
+    RESET='\033[m'
 
     SYMBOL_GIT_BRANCH='⑂'
     SYMBOL_GIT_MODIFIED='*'
@@ -48,30 +49,37 @@ __javiline() {
         done < <($git_eng status --porcelain --branch 2>/dev/null)  # note the space between the two <
 
         # print the git branch segment without a trailing newline
-        printf " $ref$marks"
+        printf "$ref$marks "
     }
 
-    __kube_info(){
-        # Using kubectl is WAAAY slower, so use this shit
-        grep ^current-context ${KUBECONFIG:-~/.kube/config}|cut -d ' ' -f 2| tr -d \\n
-    }
+#    __kube_info(){
+#        # Using kubectl is WAAAY slower, so use this shit
+#        #grep ^current-context ${KUBECONFIG:-~/.kube/config}|cut -d ' ' -f 2| tr -d \\n
+#        k_get_context
+#    }
 
     ps1() {
 
         local symbol="$PS_SYMBOL"
+        local cwd="\\[$COLOR_CWD\\]\w\\[$RESET\\]"
 
-        local cwd="$COLOR_CWD\w$RESET"
-
-        __powerline_git_info="$(__git_info)"
-        local git="$COLOR_GIT\${__powerline_git_info}$RESET"
-
-        __kube_context="$(__kube_info)"
+        #  KUBERNETES
+        __kube_context="$(k_get_context_fast)"
+        __kube_namespace="$(k_get_namespace_fast)"
         [ "${__kube_context:0,-2}" == "st" ] \
             && COLOR_KUBE="$COLOR_SUCCESS"  \
             || COLOR_KUBE="$COLOR_FAILURE"
-        local kube="($COLOR_KUBE\${__kube_context}$RESET) "
+        [ "${__kube_context}" == "paypha" ] && COLOR_KUBE="$COLOR_WARNING"
+        local kube="\\[${COLOR_KUBE}\\]\${__kube_context}\\[${RESET}\\]"
+        # Add namespace if its not the default one
+        [ "${__kube_namespace}" != "default" ] && kube="${kube}/\\[${COLOR_KUBE}\\]${__kube_namespace}\\[${RESET}\\]"
+        kube="(${kube}) "
 
-        PS1="$kube$cwd$git$symbol "
+        # GIT
+        __powerline_git_info="$(__git_info)"
+        local git="\\[$COLOR_GIT\\]\${__powerline_git_info}\\[$RESET\\]"
+
+        PS1="$kube$git$cwd$symbol "
     }
 
     PROMPT_COMMAND="ps1${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
