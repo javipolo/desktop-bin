@@ -16,7 +16,7 @@ rearrange_terminal(){
     resize_width=15
     tmp_w=18
     tmp_h=9
-    name_terminal="terminal - javi"
+    name_terminal="terminal"
     for winid in $(get_wids "$name_terminal"); do
         if [ "$winid" != "NULL" ]; then
             # Minimize window
@@ -28,6 +28,12 @@ rearrange_terminal(){
             # And set sticky
             wmctrl -i -r $winid -b remove,sticky
         fi
+    done
+}
+
+move_to_desktop(){
+    for winid in $(get_wids "$1"); do
+        wmctrl -i -r $winid -t $2
     done
 }
 
@@ -67,5 +73,7 @@ if [ $num_displays -gt 1 ]; then
         # Second screen
         rearrange $name
     done
+    # Move spotify to desktop 11 (11-1)
+    move_to_desktop spotify 10
 fi
 
